@@ -1,0 +1,42 @@
+FROM maven:3.9.6-eclipse-temurin-11-focal AS builder
+
+WORKDIR /app
+
+COPY pom.xml .
+
+RUN mvn dependency:go-offline
+
+COPY src ./src
+
+#ENV PORT 9000
+#ENV ACTIVE_PROFILE dev
+#ENV DB_HOST dbb
+#ENV DB_PORT 3306
+#ENV DB_SCHEMA ecommerce_app_database
+#ENV DB_USER mysqluser
+#ENV DB_PASS mypass
+
+RUN mvn package -DskipTests
+
+
+FROM openjdk:11-ea-jre
+
+ENV PORT 9000
+ENV ACTIVE_PROFILE dev
+ENV DB_HOST bdd
+ENV DB_PORT 3306
+ENV DB_SCHEMA ecommerce_app_database
+ENV DB_USER mysqluser
+ENV DB_PASS mypass
+
+ENV REDIS_HOST redis
+ENV REDIS_PORT 6379
+ENV REDIS_PASSWORD redispass
+
+WORKDIR /app
+
+COPY --from=builder /app/target/common-data-service.jar .
+
+EXPOSE 9000
+
+ENTRYPOINT ["java","-jar","common-data-service.jar"]

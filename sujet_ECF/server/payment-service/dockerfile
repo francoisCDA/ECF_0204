@@ -1,0 +1,26 @@
+FROM maven:3.9.6-eclipse-temurin-11-focal AS builder
+
+WORKDIR /app
+
+COPY pom.xml .
+
+RUN mvn dependency:go-offline
+
+COPY src ./src
+
+#ENV PORT 9050
+
+
+RUN mvn package -DskipTests
+
+FROM openjdk:11-ea-jre
+
+ENV PORT 9050
+
+WORKDIR /app
+
+COPY --from=builder /app/target/payment-service.jar .
+
+EXPOSE 9050
+
+ENTRYPOINT ["java","-jar","payment-service.jar"]

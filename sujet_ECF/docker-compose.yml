@@ -1,0 +1,109 @@
+version: "3.8"
+
+services:
+  bdd:
+    container_name: bdd
+    image: mysql
+    volumes:
+      - db_ecf:/var/lib/mysql
+    restart: always
+    ports:
+        - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: ecommerce_app_database
+      MYSQL_USER: mysqluser
+      MYSQL_PASSWORD: mypass
+    networks:
+      - ecf_net
+
+  phpmyadmin:
+    depends_on:
+      - bdd
+    image: phpmyadmin
+    restart: always
+    ports:
+      - "8090:80"
+    environment:
+      PMA_HOST: bdd
+    networks:
+      - ecf_net
+  
+  redis:
+    container_name: redis
+    image: redis
+    restart: always
+    environment:
+      Requirepass: redispass
+    ports:
+      - "6379:6379"
+    networks:
+      - ecf_net
+  
+  front:
+    container_name: front
+    build: 
+      context: ./client/
+      dockerfile: dockerfile
+    restart: always
+    depends_on:
+      - payment
+      - data
+      - auth
+    environment:
+      REACT_APP_COMMON_DATA_SERVICE_PORT : 9000
+      REACT_APP_AUTHENTICATION_SERVICE_PORT: 7000
+      REACT_APP_SEARCH_SUGGESTION_SERVICE_PORT : 10000
+      REACT_APP_COMMON_DATA_SERVICE_URL : data
+      REACT_APP_AUTHENTICATION_SERVICE_URL : auth
+      #REACT_APP_SEARCH_SUGGESTION_SERVICE_URL : 
+    ports:
+      - "3000:80"
+    
+  auth:
+    container_name: auth
+    restart: always
+    build:
+      context: ./server/authentication-service
+      dockerfile: dockerfile
+    depends_on:
+      - bdd
+    ports:
+      - "7000:7000"
+    networks:
+      - ecf_net
+
+  data:
+    container_name: data
+    restart: always
+    build:
+      context: ./server/common-data-service
+      dockerfile: dockerfile
+    depends_on:
+      - bdd
+      - redis
+    ports:
+      - "9000:9000"
+    networks:
+      - ecf_net
+
+  payment:
+    container_name: payment
+    restart: always
+    build: 
+      context: ./server/payment-service
+      dockerfile: dockerfile
+    depends_on:
+      - bdd
+    ports:
+      - "9050:9050" 
+    networks:
+      - ecf_net
+
+
+networks:
+  ecf_net:
+    driver: bridge
+
+volumes:
+  db_ecf:
