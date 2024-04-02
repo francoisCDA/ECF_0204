@@ -34,9 +34,10 @@ services:
     image: redis
     restart: always
     environment:
-      Requirepass: redispass
+      requirepass: redispass
     ports:
       - "6379:6379"
+    command: redis-server --save 20 1 --loglevel warning --requirepass redispass
     networks:
       - ecf_net
   

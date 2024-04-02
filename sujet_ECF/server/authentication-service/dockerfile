@@ -19,7 +19,6 @@ COPY src ./src
 
 RUN mvn package -DskipTests
 
-
 FROM openjdk:11-ea-jre
 
 ENV PORT 7000
