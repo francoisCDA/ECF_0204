@@ -359,11 +359,13 @@ export const setDefaultSearchSuggestions = () => dispatch => {
 
     searchSuggestionServiceAPI.get(DEFAULT_SEARCH_SUGGESTION_API)
         .then(response => {
+         //   console.log(response.data)
             dispatch({
                 type: SEARCH_KEYWORD, payload: {data: JSON.parse(JSON.stringify(response.data))}
             });
         })
         .catch(err => {
+          //  console.log(err)
             log.info(`[ACTION]: unable to fetch response for API = ${DEFAULT_SEARCH_SUGGESTION_API}`)
             dispatch({type: SEARCH_KEYWORD_ERROR});
         });
