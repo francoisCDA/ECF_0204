@@ -12,6 +12,6 @@ import java.util.List;
 @ToString
 public class ResultSearch implements Serializable {
 
-    private List<String> words;
+    private String link;
 
 }

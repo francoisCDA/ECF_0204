@@ -108,4 +108,5 @@ public class CommonDataController {
 
         return ResponseEntity.ok(searchSuggestionList);
     }
+
 }

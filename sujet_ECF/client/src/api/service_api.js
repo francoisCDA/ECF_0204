@@ -18,5 +18,5 @@ export const commonServiceAPI = axios.create({
 })
 
 export const searchSuggestionServiceAPI = axios.create({
-    baseURL: REACT_APP_SEARCH_SUGGESTION_SERVICE_URL || `http://localhost:${REACT_APP_SEARCH_SUGGESTION_SERVICE_PORT}`
+   baseURL: REACT_APP_SEARCH_SUGGESTION_SERVICE_URL || `http://localhost:${REACT_APP_SEARCH_SUGGESTION_SERVICE_PORT}`
 })
